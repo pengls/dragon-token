@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Tolerate;
 import lombok.extern.slf4j.Slf4j;
-
 import java.io.Serializable;
 
 /**
@@ -23,8 +22,7 @@ public class TokenParser implements Serializable {
     /**
      * crypto algorithm
      */
-    @Builder.Default
-    private CryptoTokenAlgorithm algorithm = CryptoTokenAlgorithm.AES;
+    private TokenAlgorithm algorithm;
     /**
      * compression algorithm
      */
@@ -46,6 +44,9 @@ public class TokenParser implements Serializable {
      * checkExpire
      */
     private boolean checkExpire;
+
+    private Class dataType;
+
 
 
     @Tolerate

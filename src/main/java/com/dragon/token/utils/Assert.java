@@ -1,5 +1,8 @@
 package com.dragon.token.utils;
 
+import com.dragon.token.TokenAlgorithm;
+import com.dragon.token.generate.TokenType;
+
 import java.util.Collection;
 import java.util.function.Supplier;
 
@@ -294,6 +297,12 @@ public final class Assert {
         }
     }
 
+    public static void isEffectiveAlgorithm(TokenAlgorithm tokenAlgorithm, TokenType tokenType, String message){
+        if(tokenAlgorithm.getTokenType() != tokenType){
+            throw new IllegalArgumentException(message);
+        }
+    }
+
     public static void isRangeIndex(int index, int size, Supplier<String> messageSupplier) {
         if (index < 0 || index >= size) {
             throw new IllegalArgumentException(nullSafeGet(messageSupplier));
@@ -303,4 +312,6 @@ public final class Assert {
     private static String nullSafeGet(Supplier<String> messageSupplier) {
         return messageSupplier != null ? messageSupplier.get() : null;
     }
+
+
 }

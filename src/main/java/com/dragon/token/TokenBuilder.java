@@ -23,8 +23,7 @@ public class TokenBuilder implements Serializable {
     /**
      * crypto algorithm
      */
-    @Builder.Default
-    private CryptoTokenAlgorithm algorithm = CryptoTokenAlgorithm.AES;
+    private TokenAlgorithm algorithm;
     /**
      * compression algorithm
      */

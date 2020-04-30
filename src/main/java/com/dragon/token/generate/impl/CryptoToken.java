@@ -1,18 +1,18 @@
 package com.dragon.token.generate.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dragon.crypto.Algorithm;
 import com.dragon.crypto.CryptoException;
 import com.dragon.crypto.CryptoFactory;
 import com.dragon.crypto.CryptoParam;
-import com.dragon.token.TokenBuilder;
-import com.dragon.token.TokenExpireException;
-import com.dragon.token.TokenInvalidException;
-import com.dragon.token.TokenParser;
+import com.dragon.token.*;
 import com.dragon.token.compression.CompressionException;
 import com.dragon.token.compression.CompressionFactory;
 import com.dragon.token.generate.AbstractToken;
+import com.dragon.token.generate.TokenType;
 import com.dragon.token.serialize.SerializeException;
 import com.dragon.token.serialize.SerializeFactory;
+import com.dragon.token.serialize.SerializeType;
 import com.dragon.token.utils.Assert;
 import com.dragon.token.utils.StrUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +26,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class CryptoToken extends AbstractToken {
+    private static final TokenAlgorithm DEFAULT_ALGORITHM = TokenAlgorithm.AES;
 
     @Override
     public String create(TokenBuilder builder) {
         Assert.notBlank(builder.getKey(), "the crypto key is required");
+        TokenAlgorithm tokenAlgorithm = builder.getAlgorithm() == null ? DEFAULT_ALGORITHM : builder.getAlgorithm();
+        Assert.isEffectiveAlgorithm(tokenAlgorithm, TokenType.CRYPTO_TOKEN, "please use crypto token algorithm");
 
         //serialize
         byte[] bytes = SerializeFactory.getSerializable(builder.getSerializeType()).serialize(builder);
@@ -40,7 +43,7 @@ public class CryptoToken extends AbstractToken {
         }
 
         //encrypt
-        byte[] encrypt = CryptoFactory.getCrypto(Algorithm.valueOf(builder.getAlgorithm().toString())).encrypt(CryptoParam.builder().key(builder.getKey()).data(bytes).build());
+        byte[] encrypt = CryptoFactory.getCrypto(Algorithm.valueOf(tokenAlgorithm.toString())).encrypt(CryptoParam.builder().key(builder.getKey()).data(bytes).build());
 
         return StrUtils.newStringUtf8(BASE64.encrypt(encrypt));
     }
@@ -55,12 +58,15 @@ public class CryptoToken extends AbstractToken {
         Assert.notBlank(parser.getKey(), "the crypto key is required");
         String token = parser.getToken();
         Assert.notBlank(token, "the token is blank");
+        TokenAlgorithm tokenAlgorithm = parser.getAlgorithm() == null ? DEFAULT_ALGORITHM : parser.getAlgorithm();
+        Assert.isEffectiveAlgorithm(tokenAlgorithm, TokenType.CRYPTO_TOKEN, "please use crypto token algorithm");
+
         try {
             //base64 decode
             byte[] data = BASE64.decrypt(token.getBytes());
 
             //decrypt
-            data = CryptoFactory.getCrypto(Algorithm.valueOf(parser.getAlgorithm().toString())).decrypt(CryptoParam.builder().key(parser.getKey()).data(data).build());
+            data = CryptoFactory.getCrypto(Algorithm.valueOf(tokenAlgorithm.toString())).decrypt(CryptoParam.builder().key(parser.getKey()).data(data).build());
 
             //decompression
             if (parser.getCompression() != null) {
@@ -74,6 +80,12 @@ public class CryptoToken extends AbstractToken {
             if (parser.isCheckExpire() && checkIsExpire(builder)) {
                 log.warn("token {} is expired !", parser.getToken());
                 throw new TokenExpireException("token is expire");
+            }
+
+            //TODO very low ，need change to Generics T
+            if (parser.getSerializeType() == SerializeType.FAST_JSON) {
+                JSONObject dataObj = (JSONObject) builder.getData();
+                return JSONObject.parseObject(dataObj.toJSONString(), parser.getDataType());
             }
 
             return builder.getData();

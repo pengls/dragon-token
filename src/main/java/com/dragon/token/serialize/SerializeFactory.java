@@ -12,17 +12,19 @@ import com.dragon.token.serialize.impl.KryoSerialize;
  * @Version V1.0
  */
 public abstract class SerializeFactory {
+    private static final ISerializable JDK_SERIALIZE = new JdkSerialize();
+    private static final ISerializable KRYO_SERIALIZE = new KryoSerialize();
+    private static final ISerializable FASTJSON_SERIALIZE = new FastJsonSerialize();
 
-    public static final ISerializable getSerializable(SerializeType serializeType){
-        switch (serializeType){
-            case JDK:
-                return new JdkSerialize();
+    public static final ISerializable getSerializable(SerializeType serializeType) {
+        switch (serializeType) {
             case KRYO:
-                return new KryoSerialize();
+                return KRYO_SERIALIZE;
             case FAST_JSON:
-                return new FastJsonSerialize();
+                return FASTJSON_SERIALIZE;
+            case JDK:
             default:
-                return new JdkSerialize();
+                return JDK_SERIALIZE;
         }
     }
 }

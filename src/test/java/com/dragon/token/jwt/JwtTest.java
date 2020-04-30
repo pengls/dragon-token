@@ -1,6 +1,6 @@
 package com.dragon.token.jwt;
 
-import com.dragon.token.CryptoTokenAlgorithm;
+import com.dragon.token.TokenAlgorithm;
 import com.dragon.token.TokenBuilder;
 import com.dragon.token.TokenParser;
 import com.dragon.token.compression.Compression;
@@ -37,35 +37,57 @@ public class JwtTest {
     public void tt1() throws InterruptedException {
         Stu stu = new Stu("Z-01202323","hh",11);
         String token = TokenFactory.getToken(TokenType.CRYPTO_TOKEN).create(
-                TokenBuilder.<Stu>builder()
+                TokenBuilder.builder()
                 .data(stu)
                 .compression(Compression.DEFLATE)
-                .serializeType(SerializeType.KRYO)
-                .algorithm(CryptoTokenAlgorithm.AES)
+                .algorithm(TokenAlgorithm.AES)
                 .key("abc12123112313213456778843213431")
                 .expire(3000)
                 .build());
 
 
         System.out.println(token);
+        System.out.println(token.length());
         //System.out.println(JwtToken.builder().compression(Compression.GZIP).algorithm(JwtAlgorithm.PBEWithSHA1AndDESede).key("abc12123112313213456778843213431").build().verify(token));
 
 
-        Thread.sleep(4000);
+        //Thread.sleep(4000);
 
         Stu stut = (Stu)TokenFactory.getToken(TokenType.CRYPTO_TOKEN).parse(
                 TokenParser.builder()
-                .algorithm(CryptoTokenAlgorithm.AES)
-                .serializeType(SerializeType.KRYO)
+                .algorithm(TokenAlgorithm.AES)
                 .checkExpire(true)
                 .key("abc12123112313213456778843213431")
                 .compression(Compression.DEFLATE)
                 .token(token)
+                .dataType(Stu.class)
                 .build());
 
 
         System.out.println(stut.getUid() + "--" + stut.getName() + "--" + stu.getAge());
 
+    }
+
+    @Test
+    public void t2() throws InterruptedException {
+        Stu stu = new Stu("Z-01202323","hh",11);
+        String token = TokenFactory.getToken(TokenType.JWT_TOKEN).create(
+                TokenBuilder.builder()
+                        .data(stu)
+                        .expire(3000)
+                        .build());
+
+
+        System.out.println(token);
+        System.out.println(token.length());
+        Stu stut = (Stu) TokenFactory.getToken(TokenType.JWT_TOKEN).parse(
+                TokenParser.builder()
+                        .token(token)
+                        .checkExpire(true)
+                        .dataType(Stu.class)
+                        .build());
+
+        System.out.println(stut.getUid() + "--" + stut.getName() + "--" + stu.getAge());
     }
 
 }
