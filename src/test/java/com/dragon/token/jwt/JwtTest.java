@@ -34,14 +34,31 @@ public class JwtTest {
     }
 
     @Test
+    public void t(){
+        Stu stu = new Stu("Z-01202323","abc",12);
+        long expire = 10 * 60 * 60 * 1000;
+        String key = "Abs19292381sssssdd2121sk2ksuidse";
+        String token = TokenFactory.getToken().create(TokenBuilder.builder().data(stu).key(key).expire(expire).build());
+        System.out.println(token);
+        System.out.println(token.length());
+
+        stu = (Stu)TokenFactory.getToken().parse(TokenParser.builder().key(key).token(token).build());
+        System.out.println(stu.getUid() + "--" + stu.getName() + "--" + stu.getAge());
+    }
+
+    @Test
     public void tt1() throws InterruptedException {
         Stu stu = new Stu("Z-01202323","hh",11);
         String token = TokenFactory.getToken(TokenType.CRYPTO_TOKEN).create(
-                TokenBuilder.builder()
+                 TokenBuilder.builder()
                 .data(stu)
+                //指定压缩算法
                 .compression(Compression.DEFLATE)
+                //指定加密算法
                 .algorithm(TokenAlgorithm.AES)
+                //密钥
                 .key("abc12123112313213456778843213431")
+                //有效期
                 .expire(3000)
                 .build());
 
@@ -54,7 +71,7 @@ public class JwtTest {
         //Thread.sleep(4000);
 
         Stu stut = (Stu)TokenFactory.getToken(TokenType.CRYPTO_TOKEN).parse(
-                TokenParser.builder()
+                 TokenParser.builder()
                 .algorithm(TokenAlgorithm.AES)
                 .checkExpire(true)
                 .key("abc12123112313213456778843213431")
@@ -64,7 +81,7 @@ public class JwtTest {
                 .build());
 
 
-        System.out.println(stut.getUid() + "--" + stut.getName() + "--" + stu.getAge());
+        System.out.println(stut.getUid() + "--" + stut.getName() + "--" + stut.getAge());
 
     }
 
@@ -87,7 +104,7 @@ public class JwtTest {
                         .dataType(Stu.class)
                         .build());
 
-        System.out.println(stut.getUid() + "--" + stut.getName() + "--" + stu.getAge());
+        System.out.println(stut.getUid() + "--" + stut.getName() + "--" + stut.getAge());
     }
 
 }

@@ -15,6 +15,9 @@ public final class TokenFactory {
     private static final CryptoToken CRYPTO_TOKEN = new CryptoToken();
     private static final JwtToken JWT_TOKEN = new JwtToken();
 
+    public static Token getToken() {
+        return CRYPTO_TOKEN;
+    }
 
     public static Token getToken(TokenType tokenType) {
         if (TokenType.CRYPTO_TOKEN == tokenType) {
