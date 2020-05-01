@@ -12,6 +12,8 @@ import com.dragon.token.utils.Assert;
 import com.dragon.token.utils.StrUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -48,7 +50,7 @@ public class JwtToken extends AbstractToken {
     }
 
     @Override
-    public Object parse(TokenParser parser) {
+    public <T> T parse(TokenParser parser) {
         String token = parser.getToken();
         Assert.notBlank(token, "the token is blank");
         try {
@@ -75,7 +77,7 @@ public class JwtToken extends AbstractToken {
             }
 
             JSONObject dataObj = (JSONObject) builder.getData();
-            return JSONObject.parseObject(dataObj.toJSONString(), parser.getDataType());
+            return JSONObject.parseObject(dataObj.toJSONString(), (Type) parser.getDataType());
 
         } catch (CryptoException e) {
             log.warn("token parse exception, CryptoException : {}", e.getMessage(), e);

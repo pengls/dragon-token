@@ -17,6 +17,8 @@ import com.dragon.token.utils.Assert;
 import com.dragon.token.utils.StrUtils;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Type;
+
 /**
  * @ClassName: JwtToken
  * @Description: 更安全的加密token
@@ -54,7 +56,7 @@ public class CryptoToken extends AbstractToken {
     }
 
     @Override
-    public Object parse(TokenParser parser) {
+    public <T> T parse(TokenParser parser) {
         Assert.notBlank(parser.getKey(), "the crypto key is required");
         String token = parser.getToken();
         Assert.notBlank(token, "the token is blank");
@@ -85,10 +87,10 @@ public class CryptoToken extends AbstractToken {
             //TODO very low ，need change to Generics T
             if (parser.getSerializeType() == SerializeType.FAST_JSON) {
                 JSONObject dataObj = (JSONObject) builder.getData();
-                return JSONObject.parseObject(dataObj.toJSONString(), parser.getDataType());
+                return JSONObject.parseObject(dataObj.toJSONString(), (Type) parser.getDataType());
             }
 
-            return builder.getData();
+            return (T) builder.getData();
 
         } catch (CryptoException e) {
             log.warn("token parse exception, CryptoException : {}", e.getMessage(), e);

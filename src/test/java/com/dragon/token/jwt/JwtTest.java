@@ -11,6 +11,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @ClassName: JwtTest
  * @Description: TODO
@@ -42,7 +45,7 @@ public class JwtTest {
         System.out.println(token);
         System.out.println(token.length());
 
-        stu = (Stu)TokenFactory.getToken().parse(TokenParser.builder().key(key).token(token).build());
+        stu = TokenFactory.getToken().parse(TokenParser.builder().key(key).token(token).build());
         System.out.println(stu.getUid() + "--" + stu.getName() + "--" + stu.getAge());
     }
 
@@ -64,13 +67,12 @@ public class JwtTest {
 
 
         System.out.println(token);
-        System.out.println(token.length());
         //System.out.println(JwtToken.builder().compression(Compression.GZIP).algorithm(JwtAlgorithm.PBEWithSHA1AndDESede).key("abc12123112313213456778843213431").build().verify(token));
 
 
         //Thread.sleep(4000);
 
-        Stu stut = (Stu)TokenFactory.getToken(TokenType.CRYPTO_TOKEN).parse(
+        Stu stut = TokenFactory.getToken(TokenType.CRYPTO_TOKEN).parse(
                  TokenParser.builder()
                 .algorithm(TokenAlgorithm.AES)
                 .checkExpire(true)
@@ -91,13 +93,15 @@ public class JwtTest {
         String token = TokenFactory.getToken(TokenType.JWT_TOKEN).create(
                 TokenBuilder.builder()
                         .data(stu)
+                        .algorithm(TokenAlgorithm.HmacSHA256)
                         .expire(3000)
                         .build());
 
 
         System.out.println(token);
-        System.out.println(token.length());
-        Stu stut = (Stu) TokenFactory.getToken(TokenType.JWT_TOKEN).parse(
+        //Thread.sleep(4000);
+
+        Stu stut = TokenFactory.getToken(TokenType.JWT_TOKEN).parse(
                 TokenParser.builder()
                         .token(token)
                         .checkExpire(true)
@@ -105,6 +109,29 @@ public class JwtTest {
                         .build());
 
         System.out.println(stut.getUid() + "--" + stut.getName() + "--" + stut.getAge());
+    }
+
+    @Test
+    public void t3(){
+        Map map = new HashMap<>();
+        map.put("stu", new Stu("Z-01202323","hh",11));
+        String token = TokenFactory.getToken(TokenType.JWT_TOKEN).create(
+                TokenBuilder.builder()
+                        .data(map)
+                        .expire(3000)
+                        .build());
+
+
+        System.out.println(token);
+
+        Map map2 = TokenFactory.getToken(TokenType.JWT_TOKEN).parse(
+                TokenParser.builder()
+                        .token(token)
+                        .checkExpire(true)
+                        .dataType(Map.class)
+                        .build());
+
+        System.out.println(map2);
     }
 
 }

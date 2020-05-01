@@ -36,6 +36,6 @@ public interface Token {
      * @Date: 2020/4/1 20:50
      * @Version V1.0
      */
-    Object parse(TokenParser parser);
+    <T> T parse(TokenParser parser);
 
 }
