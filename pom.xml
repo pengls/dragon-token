@@ -15,7 +15,7 @@
         <maven.javadoc.skip>false</maven.javadoc.skip>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <fastjson>1.2.68</fastjson>
+        <fastjson>1.2.83</fastjson>
         <reflections>0.9.12</reflections>
         <kryo>5.0.0-RC1</kryo>
         <lombok>1.18.12</lombok>
